@@ -124,6 +124,7 @@ namespace MarieANToinette
                 x = 0;
                 y = 0;
                 Content.TranslateTo(0, 0);
+                currentScale = 1;
             } 
             lastClick = DateTime.Now;
         }
@@ -153,7 +154,6 @@ namespace MarieANToinette
                         y = Content.TranslationY;
                         xOffset = Content.TranslationX;
                         yOffset = Content.TranslationY;
-                        currentScale = 1;
                     }
                     break;
             }
