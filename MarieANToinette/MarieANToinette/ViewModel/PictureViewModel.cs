@@ -17,14 +17,17 @@ namespace MarieANToinette
         public event PropertyChangedEventHandler PropertyChanged;
 
         RestService service = new RestService();
+        UserService userSvc = new UserService();
 
         Picture picture;
         string pictureUrl;
         string duree;
         string title = "Marie-ANToinette";
+        bool isFavorite;
 
         public ICommand RefreshCommand { protected set; get; }
         public ICommand ChangeCommand { protected set; get; }
+        public ICommand SetFavoriteCommand { protected set; get; }
 
         public PictureViewModel()
         {
@@ -50,6 +53,37 @@ namespace MarieANToinette
                     this.NextPicture();
                 }
             });
+            this.SetFavoriteCommand = new Command<string>(async (key) =>
+            {
+                if (IsFavorite)
+                {
+                    await RemovePictureFromFavorite();
+                } else
+                {
+                    await AddPictureToFavorite();
+                }
+            });
+        }
+
+        public bool IsFavorite
+        {
+            set
+            {
+                if (isFavorite != value)
+                {
+                    isFavorite = value;
+
+                    if (PropertyChanged != null)
+                    {
+                        PropertyChanged(this,
+                            new PropertyChangedEventArgs("IsFavorite"));
+                    }
+                }
+            }
+            get
+            {
+                return isFavorite;
+            }
         }
 
         public string Title
@@ -160,7 +194,6 @@ namespace MarieANToinette
 
         public async void NextPicture()
         {
-            
             Picture = await service.NextPictureAsync(picture.DateTime + getDelta());
             if (Picture != null)
             {
@@ -201,6 +234,24 @@ namespace MarieANToinette
                     return 30 * 24 * 60 * 60;
             }
             return 0;
+        }
+
+        public async Task AddPictureToFavorite()
+        {
+            if (Picture != null && Picture.FileName != null && Picture.FileName != "")
+            {
+                IsFavorite = true;
+                await userSvc.AddPictureToFavorite(Picture.FileName);
+            }
+        }
+
+        public async Task RemovePictureFromFavorite()
+        {
+            if (Picture != null && Picture.FileName != null && Picture.FileName != "")
+            {
+                IsFavorite = false;
+                await userSvc.DeletePictureFromFavorite(Picture.FileName);
+            }
         }
     }
 }

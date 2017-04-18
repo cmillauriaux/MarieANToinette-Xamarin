@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using MarieANToinette.Extensions;
 using Xamarin.Forms;
+using System.Windows.Input;
 
 namespace MarieANToinette
 {
@@ -21,6 +22,7 @@ namespace MarieANToinette
         Image image;
         AbsoluteLayout layout;
         Image progress;
+        Image favorite;
         double source = 1;
         double target = 1.20;
         double screenWidth;
@@ -85,7 +87,38 @@ namespace MarieANToinette
             AbsoluteLayout.SetLayoutFlags(this.image, AbsoluteLayoutFlags.All);
             this.layout.Children.Add(this.image);
 
+            this.favorite = new Image()
+            {
+                VerticalOptions = LayoutOptions.FillAndExpand,
+                HorizontalOptions = LayoutOptions.FillAndExpand
+            };
+            this.favorite.Source = ImageSource.FromResource("MarieANToinette.heart_grey.png");
+            AbsoluteLayout.SetLayoutBounds(this.favorite, new Rectangle(0.95, 0, 0.1, 0.1));
+            AbsoluteLayout.SetLayoutFlags(this.favorite, AbsoluteLayoutFlags.All);
+            var tapOnFavoriteGesture = new TapGestureRecognizer();
+            tapOnFavoriteGesture.Tapped += TapGesture_Tapped; ;
+            this.favorite.GestureRecognizers.Add(tapOnFavoriteGesture);
+            this.layout.Children.Add(this.favorite);
+
             this.Content = layout;
+        }
+
+        private void TapGesture_Tapped(object sender, EventArgs e)
+        {
+            SetFavorite.Execute("");
+        }
+
+        public static BindableProperty SetFavoriteProperty = BindableProperty.Create(
+                                                            propertyName: "SetFavorite",
+                                                            returnType: typeof(ICommand),
+                                                            declaringType: typeof(ICommand),
+                                                            defaultValue: null,
+                                                            defaultBindingMode: BindingMode.TwoWay);
+
+        public ICommand SetFavorite
+        {
+            get { return (ICommand)GetValue(SetFavoriteProperty); }
+            set { SetValue(SetFavoriteProperty, value); }
         }
 
         public static BindableProperty ImageSrcProperty = BindableProperty.Create(
@@ -111,6 +144,32 @@ namespace MarieANToinette
                 System.Uri.TryCreate((string)newValue, UriKind.Absolute, out uri);
                 Task<ImageSource> result = Task<ImageSource>.Factory.StartNew(() => new UriImageSource { Uri = uri, CachingEnabled = true });
                 container.image.Source = await result;
+            }
+        }
+
+        public static BindableProperty IsFavoriteProperty = BindableProperty.Create(
+                                                            propertyName: "IsFavorite",
+                                                            returnType: typeof(bool),
+                                                            declaringType: typeof(bool),
+                                                            defaultValue: false,
+                                                            defaultBindingMode: BindingMode.TwoWay,
+                                                            propertyChanged: IsFavoritePropertyChanged);
+
+        public bool IsFavorite
+        {
+            get { return (bool)GetValue(IsFavoriteProperty); }
+            set { SetValue(IsFavoriteProperty, value); }
+        }
+
+        private static void IsFavoritePropertyChanged(BindableObject bindable, object oldValue, object newValue)
+        {
+            PinchToZoomContainer container = (PinchToZoomContainer)bindable;
+            if ((bool)newValue)
+            {
+                container.favorite.Source = ImageSource.FromResource("MarieANToinette.heart_pink.png");
+            } else
+            {
+                container.favorite.Source = ImageSource.FromResource("MarieANToinette.heart_grey.png");
             }
         }
 

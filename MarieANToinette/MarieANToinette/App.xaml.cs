@@ -23,7 +23,7 @@ namespace MarieANToinette
             MainPage = new MarieANToinette.MainPage();
         }
 
-        protected override void OnStart()
+        protected async override void OnStart()
         {
             // Handle when your app starts
         }

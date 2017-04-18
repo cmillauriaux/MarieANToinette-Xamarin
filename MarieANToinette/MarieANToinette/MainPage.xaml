@@ -14,7 +14,7 @@
             <Frame.GestureRecognizers>
                 <TapGestureRecognizer Command="{Binding RefreshCommand}" CommandParameter="Frame1" />
             </Frame.GestureRecognizers>
-            <local:PinchToZoomContainer ImageSrc="{Binding PictureUrl}"></local:PinchToZoomContainer>
+            <local:PinchToZoomContainer ImageSrc="{Binding PictureUrl}" IsFavorite="{Binding IsFavorite}" SetFavorite="{Binding SetFavoriteCommand}"></local:PinchToZoomContainer>
         </Frame>
         <StackLayout Spacing="1" VerticalOptions="End" HorizontalOptions="CenterAndExpand" Orientation="Horizontal">
             <Button Text="Précédent" VerticalOptions="Start" HorizontalOptions="Center" Command="{Binding ChangeCommand}" CommandParameter="previous" />
